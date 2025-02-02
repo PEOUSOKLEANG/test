@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
-import NewTerm from "../pages/NewTerm.vue";
-import Login from "../auth/Login.vue";
+
+// Lazy load route components(Improves performance by loading components only when needed.)
+const Login = () => import("../auth/Login.vue");
+const Home = () => import("../pages/Home.vue");
+const NewSession = () => import("../pages/NewSession.vue");
+const ListSessions = () => import("../pages/ListSessions.vue");
 
 const routes = [
-  // { path: "/", redirect: "/login" }, // Redirect root path to login
-  // { path: "/login", component: Login },
-  { path: "/new-term", component: NewTerm }, // Define your route
+  { path: "/", redirect: { name: "Login" } }, // Redirect root to login
+  { path: "/login", name: "Login", component: Login, meta: { guestOnly: true } },
+  { path: "/home", name: "Home", component: Home, meta: { requiresAuth: true } },
+  { path: "/new-session", name: "NewSession", component: NewSession, meta: { requiresAuth: true } },
+  { path: "/list-sessions", name: "ListSessions", component: ListSessions, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
@@ -13,15 +19,17 @@ const router = createRouter({
   routes,
 });
 
-// Navigation guard to check authentication
-// router.beforeEach((to, from, next) => {
-//   const isAuthenticated = !!localStorage.getItem("access_token"); // Check if token exists
+// Navigation Guard for Authentication
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem("access_token");
 
-//   if (to.path === "/login" && isAuthenticated) {
-//     next("/new-term"); // Redirect logged-in users
-//   } else {
-//     next();
-//   }
-// });
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next({ name: "Login" }); // Redirect unauthenticated users to login
+  } else if (to.meta.guestOnly && isAuthenticated) {
+    next({ name: "Home" }); // Prevent logged-in users from accessing guest-only pages
+  } else {
+    next();
+  }
+});
 
 export default router;

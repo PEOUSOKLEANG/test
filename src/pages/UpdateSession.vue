@@ -1,4 +1,6 @@
 <template>
+    hello
+</Template><template>
   <div class="m-4 flex flex-col items-center">
     <Title style="font-family: 'Moul', sans-serif;" title="បញ្ចូលវគ្គសិក្សាថ្មី" />
 
@@ -39,7 +41,8 @@
 
     <div class="w-1/2 flex flex-col items-start px-5 mt-2 gap-1.5">
       <!-- <UploadFile v-for="(file, index) in uploadedFiles" :key="index" /> -->
-      <UploadFile v-for="(file, index) in uploadedFiles" :key="index" @removeFile="removeFile(index)" />
+      <UploadFile v-for="(file, index) in uploadedFiles" :key="index" @removeFile="removeFile(index)"
+        @uploadValue="(file) => handleUpload(file, index)" />
 
 
     </div>
@@ -49,8 +52,9 @@
         class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 transition">
         រក្សារទុក
       </button> -->
-      <FlexibleButton label="បោះបង់" :isCancel="true" />
-      <FlexibleButton label="រក្សារទុក" :isCancel="false" @click="submitForm" />
+      <FlexibleButton label="បោះបង់" :isCancel="true" @click="handleCencel" />
+      <FlexibleButton :label="isLoading ? 'កំពុងផ្ញើ...' : 'រក្សារទុក'" :isCancel="false" :disabled="isLoading"
+        @click="submitForm" />
 
 
 
@@ -59,45 +63,49 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useCourseStore } from "../stores/courseStore.js";
 import { onMounted } from "vue";
 import FlexibleInput from "../components/FlexibleInput.vue";
 import Title from "../components/Title.vue";
 import UploadFile from "../components/UploadFile.vue";
 import FlexibleButton from "../components/FlexibleButton.vue";
+import { useRouter } from "vue-router";
+const router = useRouter();
+const uploadedFiles = ref([]);// index start from 0 of array first element 
+const courseStore = useCourseStore();
+const isLoading = computed(() => courseStore.loading);
+
 
 const formData = ref({
-  sessionName: "",
-  trainingTypeRef: "",
-  trainingSkillRef: "",
+  sessionName: "វគ្គខ្លី សិក្ខាកាម makeup",
+  trainingTypeRef: "1",
+  trainingSkillRef: "1",
   institution: "",
-  startDate: "",
-  endDate: "",
-  notes: "",
-  trainingName: "",
-  trainingPhone: "",
-  trainingPosition: "",
+  startDate: "2024-03-23",
+  endDate: "2024-03-23",
+  trainingName: "រដ្ឋ កុល",
+  trainingPhone: "+85512478356",
+  trainingPosition: "Doctor",
 });
 
-
-const uploadedFiles = ref([]);// index start from 0 of array first element 
 
 
 
 const addFile = () => {
-  uploadedFiles.value.push({});
+    uploadedFiles.value.push({});
+  
 };
 
 const removeFile = (index) => {
   uploadedFiles.value.splice(index, 1);
 };
 
-const courseStore = useCourseStore();
+const handleUpload = (file, index) => {
+  uploadedFiles.value[index] = file; 
+};
 
-// Fetch training types when the component is mounted
-// Compute loading state
-// const isLoading = computed(() => courseStore.loading);
+
 
 // Fetch training data when the component is mounted
 onMounted(() => {
@@ -105,11 +113,22 @@ onMounted(() => {
   courseStore.fetchTrainingInstitutions();
   courseStore.fetchTrainingSkills();
 });
+const handleCencel = async () =>{
+  router.push("/"); 
 
+}
 
-
-// 🟢 Call `submitForm` from `courseStore`
-const submitForm = () => {
-  courseStore.submitForm(formData.value, uploadedFiles.value);
+const submitForm = async () => {
+  isLoading.value = true; // Start loading
+  try {
+    await courseStore.submitForm(formData.value, uploadedFiles.value);
+    router.push("/"); // Navigate after success
+  } catch (error) {
+    console.error("Error submitting form:", error);
+  } finally {
+    isLoading.value = false; // Stop loading
+  }
 };
+
+
 </script>

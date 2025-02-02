@@ -8,8 +8,8 @@ export const useCourseStore = defineStore("courseStore", () => {
   const selectTrainingTypeOptions = ref([]);
   const selectTrainingInstitution = ref([]);
   const selectTrainingSkill = ref([]);
-  const loading = ref(false); // Add loading state
-  const errorMessage = ref(null); // Handle errors
+  const loading = ref(false); 
+  const errorMessage = ref(null); 
 
   // Fetch Training Types
   const fetchTrainingTypes = async () => {
@@ -84,14 +84,14 @@ export const useCourseStore = defineStore("courseStore", () => {
 
     // Append uploaded files
     uploadedFiles.forEach((file, index) => {
-      formDataObj.append(`training_session_record_file[${index}].file`, file);
+      formDataObj.append(`training_session_record_file[${index}]file`, file);
     });
 
     // Send POST request
     const response = await apiClient.post(
       "/api/v1/public/training-session-record/add-training-record",
       formDataObj,
-      // { headers: { "Content-Type": "multipart/form-data" } }
+      { headers: { "Content-Type": "multipart/form-data" } }
     );
     console.log(response.formDataObj);
     
@@ -99,6 +99,8 @@ export const useCourseStore = defineStore("courseStore", () => {
   } catch (error) {
     errorMessage.value = "Failed to submit form.";
     console.error("Error submitting form:", error);
+    console.log();
+    
   } finally {
     loading.value = false;
   }

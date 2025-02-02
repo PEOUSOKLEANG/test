@@ -17,7 +17,7 @@
 
       <!-- Input -->
       <input
-        v-else-if="type === 'input' || type === 'date'"
+        v-else-if="type === 'input' || type === 'date' || type ==='password'"
         v-model="modelValue"
         :type="type"
         :placeholder="placeholder"
@@ -51,7 +51,7 @@ const props = defineProps({
   type: {
     type: String,
     default: "input",
-    validator: (value) => ["input", "select", "textarea", "date"].includes(value),
+    validator: (value) => ["input", "select", "textarea", "date","password"].includes(value),
   },
   options: {
     type: Array,
@@ -85,6 +85,8 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
+
+//define get the value pass to input call "set" it is fill to the top 
 const modelValue = computed({
   get: () => props.modelValue,
   set: (value) => emit("update:modelValue", value),
