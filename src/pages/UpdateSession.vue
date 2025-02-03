@@ -6,11 +6,11 @@
       <FlexibleInput v-model="formData.sessionName" label="ឈ្មោះវគ្គបណ្តុះបណ្តាល" type="input"
         placeholder="បញ្ចូលឈ្មោះវគ្គ" />
       <FlexibleInput v-model="formData.trainingTypeRef" label="ជ្រើសរើសប្រភេទបណ្តុះបណ្តាល" type="select"
-        :options="courseStore.selectTrainingTypeOptions" />
+        :options="store.selectTrainingType" />
       <FlexibleInput v-model="formData.trainingSkillRef" label="ជ្រើសរើសជំនាញ" type="select"
-        :options="courseStore.selectTrainingSkill" />
+        :options="store.selectTrainingSkill" />
       <FlexibleInput v-model="formData.institution" label="ជ្រើសរើសមណ្ឌលបណ្តុះបណ្តាល" type="select"
-        :options="courseStore.selectTrainingInstitution" />
+        :options="store.selectTrainingInstitution" />
       <FlexibleInput v-model="formData.startDate" label="ថ្ងៃចាប់ផ្ដើម" type="date" placeholder="yyyy-mm-dd" />
       <FlexibleInput v-model="formData.endDate" label="ថ្ងៃបញ្ចប់" type="date" placeholder="yyyy-mm-dd" />
       <FlexibleInput v-model="formData.notes" label="កំណត់ត្រាបន្ថែម" type="textarea"
@@ -43,7 +43,7 @@
     <div class="w-1/2 flex justify-end px-5 mt-4 gap-2.5">
       <FlexibleButton label="បោះបង់" :isCancel="true" @click="handleCancel" />
       <FlexibleButton :label="isLoading ? 'កំពុងធ្វើបច្ចុប្បន្នភាព...' : 'ធ្វើបច្ចុប្បន្នភាព'" :isCancel="false"
-        :disabled="isLoading" @click="updateForm" />
+        :disabled="isLoading" @click.prevent="updateForm" />
     </div>
 
 
@@ -60,10 +60,9 @@ import Title from "../components/Title.vue";
 import FlexibleButton from "../components/FlexibleButton.vue";
 import UploadFile from "../components/UploadFile.vue";
 
-import { useCourseStore } from "../stores/courseStore.js";
 
 const uploadedFiles = ref([]);// index start from 0 of array first element 
-const courseStore = useCourseStore();
+
 const store = useTrainingSessionsStore();
 const route = useRoute();
 const router = useRouter();
@@ -72,14 +71,14 @@ const isLoading = ref(false);
 
 // Fetch session details dynamically based on route ID
 onMounted(async () => {
+  store.getTrainingTypes();
+  store.getTrainingInstitutions();
+  store.getTrainingSkills();
   await store.fetchSessionsDetailById(sessionId);
+  
 });
 
-onMounted(() => {
-  courseStore.fetchTrainingTypes();
-  courseStore.fetchTrainingInstitutions();
-  courseStore.fetchTrainingSkills();
-});
+
 
 // Get sessionDetail from store
 const sessionDetail = computed(() => store.sessionDetail);
@@ -98,6 +97,8 @@ const formData = ref({
   trainingPhone: "",
   trainingPosition: "",
 });
+
+
 // Watch sessionDetail and update formData when it changes
 // watch(sessionDetail, (newVal) => {
 //   if (newVal) {
@@ -136,11 +137,6 @@ watch(sessionDetail, (newVal) => {
     }));
   }
 }, { immediate: true });
-
-
-
-
-
 
 const handleCancel = () => {
   router.push(`/view-details/${route.params.id}`);

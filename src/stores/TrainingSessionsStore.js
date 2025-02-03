@@ -1,9 +1,13 @@
 import { defineStore } from "pinia";
 import apiClient from "../api/apiClient"; // Import Axios instance
+import { fetchTrainingTypes, fetchTrainingInstitutions, fetchTrainingSkills, submitTrainingSession, submitUpdateSessionByID} from "../api/trainingSession";
 
 export const useTrainingSessionsStore = defineStore("trainingSessions", {
   state: () => ({
     sessions: [],
+    selectTrainingType: [],
+    selectTrainingInstitution: [],
+    selectTrainingSkill: [],
     sessionDetail: null,
     currentPage: 1,
     totalPages: 1,
@@ -13,6 +17,51 @@ export const useTrainingSessionsStore = defineStore("trainingSessions", {
     error: null,
   }),
   actions: {
+    async getTrainingTypes() {
+      this.loading = true;
+      try {
+        this.selectTrainingType = await fetchTrainingTypes();
+      } catch (error) {
+        this.errorMessage = "Failed to fetch training types.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getTrainingInstitutions() {
+      this.loading = true;
+      try {
+        this.selectTrainingInstitution = await fetchTrainingInstitutions();
+      } catch (error) {
+        this.errorMessage = "Failed to fetch training institutions.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getTrainingSkills() {
+      this.loading = true;
+      try {
+        this.selectTrainingSkill = await fetchTrainingSkills();
+      } catch (error) {
+        this.errorMessage = "Failed to fetch training skills.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async submitSession(formData, uploadedFiles) {
+      this.loading = true;
+      try {
+        await submitTrainingSession(formData, uploadedFiles);
+      } catch (error) {
+        this.errorMessage = "Failed to submit form.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    
     async fetchSessions(page = 1) {
       this.loading = true;
       this.error = null;
@@ -68,14 +117,14 @@ export const useTrainingSessionsStore = defineStore("trainingSessions", {
       this.sessionDetail = null; // Clear old data before fetching
 
       try {
-        // const training_session_record_id =2;
+        
         const response = await apiClient.get(
           `/api/v1/public/training-session-record/get-detail?training_session_record_id=${training_session_record_id}`
         );
         console.log(response.data.data.results);
 
         const sessionData = response.data.data.results;
-        const BASE_URL = import.meta.env.VITE_API_URL
+        const BASE_URL = import.meta.env.VITE_API_URL;
         this.sessionDetail = {
           id: sessionData.id,
           sessionName: sessionData.session_name,
@@ -114,38 +163,17 @@ export const useTrainingSessionsStore = defineStore("trainingSessions", {
     },
 
     //edit file
-    async updateSessionByID(training_session_record_id, formData,uploadedFiles) {
+    async updateSessionByID(
+      training_session_record_id,
+      formData,
+      uploadedFiles
+    ) {
       // this.loading = true;
       // this.error = null;
       try {
-        const formDataObj = new FormData();
-
-        // Append course details
-        formDataObj.append("starting_date", formData.startDate);
-        formDataObj.append("ending_date", formData.endDate);
-        formDataObj.append("institution", formData.institution);
-        formDataObj.append("training_skill_ref", formData.trainingSkillRef); //trainingSkillRef
-        formDataObj.append("training_status_ref", "1");
-        formDataObj.append("training_type_ref", formData.trainingTypeRef); //trainingTypeRef
-        formDataObj.append("session_name", formData.sessionName); //sessionName
-        formDataObj.append("training_name", formData.trainingName); //trainingName
-        formDataObj.append("training_phone", formData.trainingPhone); //trainingPhone
-        formDataObj.append("training_position", formData.trainingPosition); //trainingPosition
-
-        // Append uploaded files
-        uploadedFiles.forEach((file, index) => {
-          formDataObj.append(`training_session_record_file[${index}]file`, file);
-        });
-
-        // Send POST request
-        const response = await apiClient.post(
-          `/api/v1/public/training-session-record/update-training-session-record?training_session_record_id=${training_session_record_id}`,
-          formDataObj,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
-        console.log(response.formDataObj);
-
-        console.log("Success:", response.data);
+        await submitUpdateSessionByID(training_session_record_id,
+          formData,
+          uploadedFiles);
       } catch (error) {
         errorMessage.value = "Failed to submit form.";
         // console.error("Error submitting form:", error);

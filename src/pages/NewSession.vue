@@ -6,10 +6,10 @@
       <FlexibleInput v-model="formData.sessionName" label="ឈ្មោះវគ្គបណ្តុះបណ្តាល" type="input"
         placeholder="បញ្ចូលឈ្មោះវគ្គ" />
       <FlexibleInput v-model="formData.trainingTypeRef" label="ជ្រើសរើសប្រភេទបណ្តុះបណ្តាល" type="select"
-        :options="courseStore.selectTrainingTypeOptions" />
+        :options="store.selectTrainingType" />
       <FlexibleInput v-model="formData.trainingSkillRef" label="ជ្រើសរើសជំនាញ" type="select"
-        :options="courseStore.selectTrainingSkill" />
-      <FlexibleInput v-model="formData.institution" label="ជ្រើសរើសមណ្ឌលបណ្តុះបណ្តាល" type="select" :options="courseStore.selectTrainingInstitution
+        :options="store.selectTrainingSkill" />
+      <FlexibleInput v-model="formData.institution" label="ជ្រើសរើសមណ្ឌលបណ្តុះបណ្តាល" type="select" :options="store.selectTrainingInstitution
         " />
       <FlexibleInput v-model="formData.startDate" label="ថ្ងៃចាប់ផ្ដើម" type="date" placeholder="yyyy-mm-dd" />
       <FlexibleInput v-model="formData.endDate" label="ថ្ងៃបញ្ចប់" type="date" placeholder="yyyy-mm-dd" />
@@ -42,7 +42,7 @@
     </div>
 
     <div class="w-1/2 flex justify-end px-5 mt-4 gap-2.5">
- 
+
       <FlexibleButton label="បោះបង់" :isCancel="true" @click="handleCencel" />
       <FlexibleButton :label="isLoading ? 'កំពុងផ្ញើ...' : 'រក្សារទុក'" :isCancel="false" :disabled="isLoading"
         @click="submitForm" />
@@ -55,17 +55,16 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useCourseStore } from "../stores/courseStore.js";
+import { useRouter } from "vue-router";
 import { onMounted } from "vue";
 import FlexibleInput from "../components/FlexibleInput.vue";
 import Title from "../components/Title.vue";
 import UploadFile from "../components/UploadFile.vue";
 import FlexibleButton from "../components/FlexibleButton.vue";
-import { useRouter } from "vue-router";
+import { useTrainingSessionsStore } from "../stores/TrainingSessionsStore";
 const router = useRouter();
 const uploadedFiles = ref([]);// index start from 0 of array first element 
-const courseStore = useCourseStore();
-const isLoading = computed(() => courseStore.loading);
+const store = useTrainingSessionsStore();
 
 
 const formData = ref({
@@ -75,17 +74,23 @@ const formData = ref({
   institution: "",
   startDate: "2024-03-23",
   endDate: "2024-03-23",
-  trainingName: "រដ្ឋ កុល",
-  trainingPhone: "+85512478356",
+  trainingName: "រដ្ឋ",
+  trainingPhone: "012478356",
   trainingPosition: "Doctor",
 });
 
+onMounted(() => {
+  store.getTrainingTypes();
+  store.getTrainingInstitutions();
+  store.getTrainingSkills();
 
+
+});
 
 
 const addFile = () => {
-    uploadedFiles.value.push({});
-  
+  uploadedFiles.value.push({});
+
 };
 
 const removeFile = (index) => {
@@ -93,31 +98,26 @@ const removeFile = (index) => {
 };
 
 const handleUpload = (file, index) => {
-  uploadedFiles.value[index] = file; 
+  uploadedFiles.value[index] = file;
 };
 
 
-
-// Fetch training data when the component is mounted
-onMounted(() => {
-  courseStore.fetchTrainingTypes();
-  courseStore.fetchTrainingInstitutions();
-  courseStore.fetchTrainingSkills();
-});
-const handleCencel = async () =>{
-  router.push("/"); 
+const handleCencel = async () => {
+  router.push("/");
 
 }
+
+const isLoading = computed(() => store.loading);
 
 const submitForm = async () => {
   isLoading.value = true; // Start loading
   try {
-    await courseStore.submitForm(formData.value, uploadedFiles.value);
-    router.push("/"); // Navigate after success
+    await store.submitSession(formData.value, uploadedFiles.value);
+    router.push("/"); 
   } catch (error) {
     console.error("Error submitting form:", error);
   } finally {
-    isLoading.value = false; // Stop loading
+    isLoading.value = false; 
   }
 };
 
