@@ -39,8 +39,6 @@
       <!-- <UploadFile v-for="(file, index) in uploadedFiles" :key="index" /> -->
       <UploadFile v-for="(file, index) in uploadedFiles" :key="index" @removeFile="removeFile(index)"
         @uploadValue="(file) => handleUpload(file, index)" />
-
-
     </div>
 
     <div class="w-1/2 flex justify-end px-5 mt-4 gap-2.5">

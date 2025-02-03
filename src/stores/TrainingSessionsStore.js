@@ -75,7 +75,7 @@ export const useTrainingSessionsStore = defineStore("trainingSessions", {
         console.log(response.data.data.results);
 
         const sessionData = response.data.data.results;
-
+        const BASE_URL = import.meta.env.VITE_API_URL
         this.sessionDetail = {
           id: sessionData.id,
           sessionName: sessionData.session_name,
@@ -99,9 +99,9 @@ export const useTrainingSessionsStore = defineStore("trainingSessions", {
             position: sessionData.training_position || "N/A",
           },
           files:
-            sessionData.files?.map((file) => ({
-              name: file.name,
-              url: file.url,
+            sessionData.training_session_record_file?.map((file) => ({
+              name: `File ${file.id}`,
+              url: `${BASE_URL}${file.file}`, // Correctly prefix the URL
             })) || [],
           description: sessionData.description || "",
         };
@@ -114,30 +114,29 @@ export const useTrainingSessionsStore = defineStore("trainingSessions", {
     },
 
     //edit file
-    async updateSessionByID(training_session_record_id , formData) {
+    async updateSessionByID(training_session_record_id, formData,uploadedFiles) {
       // this.loading = true;
       // this.error = null;
       try {
-        
         const formDataObj = new FormData();
-    
+
         // Append course details
         formDataObj.append("starting_date", formData.startDate);
         formDataObj.append("ending_date", formData.endDate);
         formDataObj.append("institution", formData.institution);
-        formDataObj.append("training_skill_ref", formData.trainingSkillRef);//trainingSkillRef
+        formDataObj.append("training_skill_ref", formData.trainingSkillRef); //trainingSkillRef
         formDataObj.append("training_status_ref", "1");
-        formDataObj.append("training_type_ref", formData.trainingTypeRef);//trainingTypeRef
-        formDataObj.append("session_name", formData.sessionName);//sessionName
-        formDataObj.append("training_name", formData.trainingName);//trainingName
-        formDataObj.append("training_phone", formData.trainingPhone);//trainingPhone
-        formDataObj.append("training_position", formData.trainingPosition);//trainingPosition
-    
+        formDataObj.append("training_type_ref", formData.trainingTypeRef); //trainingTypeRef
+        formDataObj.append("session_name", formData.sessionName); //sessionName
+        formDataObj.append("training_name", formData.trainingName); //trainingName
+        formDataObj.append("training_phone", formData.trainingPhone); //trainingPhone
+        formDataObj.append("training_position", formData.trainingPosition); //trainingPosition
+
         // Append uploaded files
-        // uploadedFiles.forEach((file, index) => {
-        //   formDataObj.append(`training_session_record_file[${index}]file`, file);
-        // });
-    
+        uploadedFiles.forEach((file, index) => {
+          formDataObj.append(`training_session_record_file[${index}]file`, file);
+        });
+
         // Send POST request
         const response = await apiClient.post(
           `/api/v1/public/training-session-record/update-training-session-record?training_session_record_id=${training_session_record_id}`,
@@ -145,14 +144,13 @@ export const useTrainingSessionsStore = defineStore("trainingSessions", {
           { headers: { "Content-Type": "multipart/form-data" } }
         );
         console.log(response.formDataObj);
-        
+
         console.log("Success:", response.data);
       } catch (error) {
         errorMessage.value = "Failed to submit form.";
         // console.error("Error submitting form:", error);
         // console.log();
-        
-      } 
+      }
     },
   },
 });

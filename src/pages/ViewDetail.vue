@@ -1,5 +1,5 @@
 <template>
-    <div class="m-4 flex flex-col items-center">
+    <div class="m-4 flex flex-col items-center" :key="route.params.id">
         <div class="p-6 w-2/3 shadow-lg rounded-xl border border-gray-200 bg-white space-y-6">
             <!-- Course Information -->
             <div v-if="sessionDetail">

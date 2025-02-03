@@ -52,14 +52,19 @@
 import { ref, defineProps, defineEmits } from "vue";
 
 const props = defineProps({
+  file: Object,
   removeElement: Function, // Accept the prop to remove the element
 });
 
 const emit = defineEmits(["removeFile", "uploadValue"]);
 
 const fileName = ref("");
-const previewUrl = ref("");
+// const previewUrl = ref("");
+const previewUrl = ref(props.file?.url || "");
+
 const isImage = ref(false);
+
+
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
@@ -85,6 +90,40 @@ const removeFile = () => {
 };
 </script>
 
-<style scoped>
-/* Optional: Adjust styles further if needed */
-</style>
+
+<!-- <script setup>`
+import { ref, defineProps, defineEmits, computed } from "vue";
+
+const props = defineProps({
+  file: Object,  // ✅ Ensure file is a prop
+});
+
+const emit = defineEmits(["removeFile", "uploadValue"]);
+
+const fileName = ref(props.file?.name || "");
+const previewUrl = ref(props.file?.url || "");
+const isImage = ref(props.file?.url?.match(/\.(jpeg|jpg|png|gif)$/) !== null);
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  fileName.value = file.name;
+  isImage.value = file.type.startsWith("image");
+
+  if (isImage.value) {
+    previewUrl.value = URL.createObjectURL(file);
+  } else {
+    previewUrl.value = "";
+  }
+
+  emit("uploadValue", { name: file.name, file });
+};
+
+const removeFile = () => {
+  fileName.value = "";
+  previewUrl.value = "";
+  isImage.value = false;
+  emit("removeFile");
+};
+</script> -->
