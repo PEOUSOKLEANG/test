@@ -1,12 +1,13 @@
 <template>
-  <div
-    class="flex flex-col bg-white shadow-lg p-6 rounded-2xl border border-gray-200 hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+  <router-link
+    :to="'/view-details/' + id"
+    class="flex flex-col bg-white shadow-lg p-6 rounded-2xl border border-gray-200 hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer"
+  >
     <!-- Session Name -->
     <div class="flex justify-center text-xl font-bold text-blue-700 tracking-wide">
       {{ sessionName }}
     </div>
 
-    
     <!-- Session Details -->
     <div class="px-3 grid gap-2 text-gray-800 mt-2">
       <p class="flex items-center gap-2">
@@ -25,14 +26,13 @@
         </span>
         <span class="font-medium text-sm md:text-base text-gray-800">{{ trainingInstitution }}</span>
       </p>
-
     </div>
-
-  </div>
+  </router-link>
 </template>
 
 <script setup>
 defineProps({
+  id: String, // Ensure session ID is passed for navigation
   trainingName: String,
   sessionName: String,
   startingDate: String,
@@ -40,10 +40,3 @@ defineProps({
   trainingInstitution: String,
 });
 </script>
-
-<style scoped>
-/* Custom Styling for 3D Effect */
-div:hover {
-  transition: all 0.3s ease-in-out;
-}
-</style>

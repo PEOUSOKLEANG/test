@@ -5,13 +5,50 @@ const Login = () => import("../auth/Login.vue");
 const Home = () => import("../pages/Home.vue");
 const NewSession = () => import("../pages/NewSession.vue");
 const ListSessions = () => import("../pages/ListSessions.vue");
+const ViewDetail = () => import("../pages/viewDetail.vue");
+const UpdateSession =()=>import("../pages/UpdateSession.vue");
+
 
 const routes = [
   { path: "/", redirect: { name: "Login" } }, // Redirect root to login
-  { path: "/login", name: "Login", component: Login, meta: { guestOnly: true } },
-  { path: "/home", name: "Home", component: Home, meta: { requiresAuth: true } },
-  { path: "/new-session", name: "NewSession", component: NewSession, meta: { requiresAuth: true } },
-  { path: "/list-sessions", name: "ListSessions", component: ListSessions, meta: { requiresAuth: true } },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
+    meta: { guestOnly: true },
+  },
+  {
+    path: "/home",
+    name: "Home",
+    component: Home,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/new-session",
+    name: "NewSession",
+    component: NewSession,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/list-sessions",
+    name: "ListSessions",
+    component: ListSessions,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/view-details/:id",
+    name: "ViewDetails",
+    component: ViewDetail,
+    props:true,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/update-session/:id",
+    name: "UpdateSession",
+    component: UpdateSession,
+    props:true,
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({

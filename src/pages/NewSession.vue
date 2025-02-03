@@ -12,9 +12,7 @@
       <FlexibleInput v-model="formData.institution" label="ជ្រើសរើសមណ្ឌលបណ្តុះបណ្តាល" type="select" :options="courseStore.selectTrainingInstitution
         " />
       <FlexibleInput v-model="formData.startDate" label="ថ្ងៃចាប់ផ្ដើម" type="date" placeholder="yyyy-mm-dd" />
-      <!-- <FlexibleInput v-model="formData.startDate" label="ថ្ងៃចាប់ផ្ដើម" type="input" placeholder="yyyy-mm-dd" /> -->
       <FlexibleInput v-model="formData.endDate" label="ថ្ងៃបញ្ចប់" type="date" placeholder="yyyy-mm-dd" />
-      <!-- <FlexibleInput v-model="formData.endDate" label="ថ្ងៃបញ្ចប់" type="input" placeholder="yyyy-mm-dd" /> -->
       <FlexibleInput v-model="formData.notes" label="កំណត់ត្រាបន្ថែម" type="textarea"
         placeholder="បញ្ចូលអត្ថបទកំណត់ត្រាបន្ថែម" />
     </div>
@@ -46,10 +44,7 @@
     </div>
 
     <div class="w-1/2 flex justify-end px-5 mt-4 gap-2.5">
-      <!-- <button @click="submitForm"
-        class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 transition">
-        រក្សារទុក
-      </button> -->
+ 
       <FlexibleButton label="បោះបង់" :isCancel="true" @click="handleCencel" />
       <FlexibleButton :label="isLoading ? 'កំពុងផ្ញើ...' : 'រក្សារទុក'" :isCancel="false" :disabled="isLoading"
         @click="submitForm" />
