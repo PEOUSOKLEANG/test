@@ -168,8 +168,6 @@ export const useTrainingSessionsStore = defineStore("trainingSessions", {
       formData,
       uploadedFiles
     ) {
-      // this.loading = true;
-      // this.error = null;
       try {
         await submitUpdateSessionByID(training_session_record_id,
           formData,
@@ -177,7 +175,7 @@ export const useTrainingSessionsStore = defineStore("trainingSessions", {
       } catch (error) {
         errorMessage.value = "Failed to submit form.";
         // console.error("Error submitting form:", error);
-        // console.log();
+      
       }
     },
   },
