@@ -40,6 +40,9 @@
       <UploadFile v-for="(file, index) in uploadedFiles" :key="index" @removeFile="removeFile(index)"
         @uploadValue="(file) => handleUpload(file, index)" />
     </div>
+    <p v-if="errorMessage" class="text-red-500 text-sm mt-2 w-1/2 flex flex-col items-start px-5 gap-1.5">
+      {{ errorMessage }}
+    </p>
 
     <div class="w-1/2 flex justify-end px-5 mt-4 gap-2.5">
 
@@ -65,6 +68,7 @@ import { useTrainingSessionsStore } from "../stores/TrainingSessionsStore";
 const router = useRouter();
 const uploadedFiles = ref([]);// index start from 0 of array first element 
 const store = useTrainingSessionsStore();
+const errorMessage = ref("");
 
 
 const formData = ref({
@@ -99,27 +103,36 @@ const removeFile = (index) => {
 
 const handleUpload = (file, index) => {
   uploadedFiles.value[index] = file;
+  errorMessage.value = ""; // Clear error if file is valid
+
 };
 
-
-const handleCencel = async () => {
-  router.push("/");
-
-}
 
 const isLoading = computed(() => store.loading);
 
 const submitForm = async () => {
+
+  if (uploadedFiles.value.some(file => !file || !(file instanceof File))) {
+    errorMessage.value = "សូមជ្រើសរើសឯកសារទាំងអស់មុននឹងធ្វើរក្សារទុក!";
+    console.log("Uploaded files validation failed:", uploadedFiles.value);
+    return;
+  }
   isLoading.value = true; // Start loading
   try {
     await store.submitSession(formData.value, uploadedFiles.value);
-    router.push("/"); 
+    router.push("/");
+    console.log("file", uploadedFiles.value);
+
   } catch (error) {
     console.error("Error submitting form:", error);
   } finally {
-    isLoading.value = false; 
+    isLoading.value = false;
   }
 };
+const handleCencel = async () => {
+  router.push("/");
+
+}
 
 
 </script>
